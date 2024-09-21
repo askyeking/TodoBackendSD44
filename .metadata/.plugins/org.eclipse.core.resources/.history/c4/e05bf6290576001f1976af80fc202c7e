@@ -1,0 +1,12 @@
+package com.skilldistillery.todoapp.entities;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+
+@Entity
+public class User {
+	
+	@Id
+	@GeneratedValue(strategy = )
+	private int id;
+}

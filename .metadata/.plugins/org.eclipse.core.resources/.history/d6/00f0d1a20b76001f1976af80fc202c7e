@@ -1,0 +1,21 @@
+package com.skilldistillery.todoapp.services;
+
+public class TodoServiceImpl implements TodoService {
+	
+	@Override
+	public Set<Todo> index(String username) {
+	  return todoRepo.findByUser_Username(username);
+	}
+	// ...
+	@Override
+	public Todo create(String username, Todo todo) {
+	  User user = userRepo.findByUsername(username);
+	  if (user != null) {
+	    todo.setUser(user);
+	    return todoRepo.saveAndFlush(todo);
+	  }
+	  return null;
+	}
+
+
+}

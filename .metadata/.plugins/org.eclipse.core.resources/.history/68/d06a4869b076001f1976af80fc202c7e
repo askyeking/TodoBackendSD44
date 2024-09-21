@@ -1,0 +1,87 @@
+package com.skilldistillery.todoapp.controllers;
+
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.skilldistillery.todoapp.entities.Todo;
+import com.skilldistillery.todoapp.services.TodoService;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@RestController
+@RequestMapping("api")
+@CrossOrigin({ "*", "http://localhost/" })
+public class TodoController {
+
+	@Autowired
+	private TodoService todoService;
+	
+	private String username = "shaun";
+	
+	@GetMapping("ping")
+	public String ping() {
+		return "pong";
+	}
+
+	@GetMapping("todos")
+	public Set<Todo> index(HttpServletRequest req, HttpServletResponse res) {
+		return todoService.index(username); 
+	}
+
+	@GetMapping("todos/{tid}")
+	public Todo show(HttpServletRequest req, HttpServletResponse res, @PathVariable("tid") int tid) {
+		Todo todo = todoService.show(username, tid);
+		if(todo != null) {
+			res.setStatus(HttpServletResponse.SC_NOT_FOUND); //404
+		}
+		return todo;
+	}
+
+//  POST todos
+	@PostMapping("todos")
+	public Todo create(HttpServletRequest req, HttpServletResponse res, @RequestBody Todo todo) {
+		Todo createdTodo = null;
+		
+		try {
+			createdTodo = todoService.create(username, todo);
+			if(createdTodo != null) {
+				res.setStatus(HttpServletResponse.SC_CREATED);
+				res.setHeader("location", req.getRequestURL().append("/").append(createdTodo.getId()).toString());
+			} else {
+				res.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //401
+			}
+			
+		} catch (Exception e) {
+			res.setStatus(HttpServletResponse.SC_BAD_REQUEST); //400
+		}
+		
+		return createdTodo;
+	}
+
+//  PUT todos/{tid}
+	@PutMapping("todos/{tid}")
+	public Todo update(HttpServletRequest req, HttpServletResponse res,  @PathVariable("tid") int tid, @RequestBody Todo todo) {
+		Todo updatedTodo = todoService.update(username, tid, todo);
+		if(updatedTodo == null) {
+			res.setStatus(HttpServletResponse.SC_UNAUTHORIZED); //401
+		}
+		return null;
+	}
+
+//  DELETE todos/{tid}
+	@DeleteMapping("todos/{tid}")
+	public void destroy(HttpServletRequest req, HttpServletResponse res, @PathVariable("tid") int tid) {
+	}
+
+}
