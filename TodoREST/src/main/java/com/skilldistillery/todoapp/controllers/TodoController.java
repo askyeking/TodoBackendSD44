@@ -43,7 +43,7 @@ public class TodoController {
 	@GetMapping("todos/{tid}")
 	public Todo show(HttpServletRequest req, HttpServletResponse res, @PathVariable("tid") int tid) {
 		Todo todo = todoService.show(username, tid);
-		if(todo != null) {
+		if(todo == null) {
 			res.setStatus(HttpServletResponse.SC_NOT_FOUND); //404
 		}
 		return todo;
@@ -104,9 +104,4 @@ public class TodoController {
 		
 	}
 	
-	public void someMethod() {
-		Stack<Character> stack = new Stack<>();
-		
-	}
-
 }
